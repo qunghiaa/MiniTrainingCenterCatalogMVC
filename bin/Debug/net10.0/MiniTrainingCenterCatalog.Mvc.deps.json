@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "MiniTrainingCenterCatalog.Mvc/1.0.0": {
+        "runtime": {
+          "MiniTrainingCenterCatalog.Mvc.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MiniTrainingCenterCatalog.Mvc/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

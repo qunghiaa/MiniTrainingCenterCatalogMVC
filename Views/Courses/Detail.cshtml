@@ -1,0 +1,49 @@
+@model MiniTrainingCenterCatalog.Mvc.ViewModels.CourseDetailViewModel
+
+<h2>Course Detail</h2>
+
+<table class="table table-bordered">
+
+<tr>
+    <th>Course Code</th>
+    <td>@Model.CourseCode</td>
+</tr>
+
+<tr>
+    <th>Course Name</th>
+    <td>@Model.CourseName</td>
+</tr>
+
+<tr>
+    <th>Instructor</th>
+    <td>@Model.Instructor</td>
+</tr>
+
+<tr>
+    <th>Fee</th>
+    <td>@Model.Fee.ToString("N0") VND</td>
+</tr>
+
+<tr>
+    <th>Capacity</th>
+    <td>@Model.Capacity</td>
+</tr>
+
+<tr>
+    <th>Students</th>
+    <td>@Model.EnrolledStudents</td>
+</tr>
+
+<tr>
+    <th>Status</th>
+    <td>@Model.Status</td>
+</tr>
+
+</table>
+
+<a class="btn btn-secondary"
+   asp-action="Index">
+
+    Back
+
+</a>

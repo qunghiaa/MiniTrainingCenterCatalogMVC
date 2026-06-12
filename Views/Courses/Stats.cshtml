@@ -1,0 +1,71 @@
+@model MiniTrainingCenterCatalog.Mvc.ViewModels.CourseStatsViewModel
+
+<h2>Training Center Statistics</h2>
+
+<div class="row">
+
+    <div class="col-md-3">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h5>Total Courses</h5>
+
+                <h3>@Model.TotalCourses</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h5>Full Courses</h5>
+
+                <h3>@Model.FullCourses</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h5>Available</h5>
+
+                <h3>@Model.AvailableCourses</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h5>Revenue</h5>
+
+                <h3>@Model.TotalRevenue.ToString("N0")</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
