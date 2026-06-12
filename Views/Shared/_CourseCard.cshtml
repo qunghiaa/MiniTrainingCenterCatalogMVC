@@ -1,0 +1,41 @@
+@model MiniTrainingCenterCatalog.Mvc.ViewModels.CourseListItemViewModel
+
+<div class="card mb-3">
+
+    <div class="card-body">
+
+        <h5>@Model.CourseName</h5>
+
+        <p>
+            Instructor:
+            @Model.Instructor
+        </p>
+
+        @if(Model.Status=="Full")
+        {
+            <span class="badge bg-danger">
+                Full
+            </span>
+        }
+        else
+        {
+            <span class="badge bg-success">
+                Available
+            </span>
+        }
+
+        <br />
+        <br />
+
+        <a class="btn btn-primary btn-sm"
+           asp-controller="Courses"
+           asp-action="Detail"
+           asp-route-id="@Model.Id">
+
+            Detail
+
+        </a>
+
+    </div>
+
+</div>

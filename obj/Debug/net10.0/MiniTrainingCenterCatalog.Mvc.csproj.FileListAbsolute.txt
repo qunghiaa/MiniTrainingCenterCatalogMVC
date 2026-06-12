@@ -95,3 +95,4 @@ C:\Users\nghia\OneDrive - VNU-HCMUS\Desktop\lab2\lab02\MiniTrainingCenterCatalog
 C:\Users\nghia\OneDrive - VNU-HCMUS\Desktop\lab2\lab02\MiniTrainingCenterCatalog.Mvc\obj\Debug\net10.0\MiniTrainingCenterCatalog.Mvc.pdb
 C:\Users\nghia\OneDrive - VNU-HCMUS\Desktop\lab2\lab02\MiniTrainingCenterCatalog.Mvc\obj\Debug\net10.0\MiniTrainingCenterCatalog.Mvc.genruntimeconfig.cache
 C:\Users\nghia\OneDrive - VNU-HCMUS\Desktop\lab2\lab02\MiniTrainingCenterCatalog.Mvc\obj\Debug\net10.0\ref\MiniTrainingCenterCatalog.Mvc.dll
+C:\Users\nghia\OneDrive - VNU-HCMUS\Desktop\lab2\lab02\MiniTrainingCenterCatalog.Mvc\obj\Debug\net10.0\MiniTrainingCenterCatalog.Mvc.sourcelink.json

@@ -1,29 +1,38 @@
-@model IEnumerable<MiniTrainingCenterCatalog.Mvc.Models.Course>
+@model MiniTrainingCenterCatalog.Mvc.ViewModels.CourseSearchViewModel
 
 <h2>Search Course</h2>
 
 <form method="get">
 
-    <input type="text"
-           name="keyword"
-           class="form-control"
-           placeholder="Enter course name..." />
+    <div class="mb-3">
+        <label>Course Name</label>
+        <input asp-for="Keyword"
+               class="form-control" />
+    </div>
 
-    <br />
+    <div class="mb-3">
+        <label>Instructor</label>
+        <input asp-for="Instructor"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Minimum Fee</label>
+        <input asp-for="MinFee"
+               class="form-control" />
+    </div>
 
     <button class="btn btn-primary">
-
         Search
-
     </button>
 
 </form>
 
-<hr />
-
-@foreach(var item in Model)
+@if(ViewBag.Count != null)
 {
-    <p>
-        @item.CourseName
-    </p>
+    <div class="alert alert-info mt-3">
+
+        Found @ViewBag.Count course(s)
+
+    </div>
 }

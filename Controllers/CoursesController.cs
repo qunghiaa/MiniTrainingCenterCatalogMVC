@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MiniTrainingCenterCatalog.Mvc.Services;
 using MiniTrainingCenterCatalog.Mvc.ViewModels;
-
+using MiniTrainingCenterCatalog.Mvc.Models;
 namespace MiniTrainingCenterCatalog.Mvc.Controllers;
 
 public class CoursesController : Controller
@@ -111,19 +111,74 @@ public class CoursesController : Controller
         return Json(data);
     }
 
-    public IActionResult Search(string keyword)
+   public IActionResult Search(
+    CourseSearchViewModel vm)
 {
     var courses = _service.GetAll();
 
-    if (!string.IsNullOrEmpty(keyword))
+    if (!string.IsNullOrEmpty(vm.Keyword))
     {
         courses = courses
-            .Where(x => x.CourseName.Contains(
-                keyword,
-                StringComparison.OrdinalIgnoreCase))
+            .Where(x =>
+                x.CourseName.Contains(
+                    vm.Keyword,
+                    StringComparison.OrdinalIgnoreCase))
             .ToList();
     }
 
-    return View(courses);
+    if (!string.IsNullOrEmpty(vm.Instructor))
+    {
+        courses = courses
+            .Where(x =>
+                x.Instructor.Contains(
+                    vm.Instructor,
+                    StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    if (vm.MinFee.HasValue)
+    {
+        courses = courses
+            .Where(x =>
+                x.Fee >= vm.MinFee.Value)
+            .ToList();
+    }
+
+    ViewBag.Count = courses.Count;
+
+    return View(vm);
+}
+public IActionResult Create()
+{
+    return View();
+}
+[HttpPost]
+public IActionResult Create(
+    CourseCreateViewModel vm)
+{
+    if (!ModelState.IsValid)
+    {
+        return View(vm);
+    }
+
+    _service.Add(new Course
+    {
+        CourseCode = $"NEW{DateTime.Now.Ticks}",
+
+        CourseName = vm.CourseName,
+
+        Instructor = vm.Instructor,
+
+        Fee = vm.Fee,
+
+        Capacity = vm.Capacity,
+
+        EnrolledStudents = 0
+    });
+
+    TempData["Success"] =
+        "Added course successfully.";
+
+    return RedirectToAction("Index");
 }
 }

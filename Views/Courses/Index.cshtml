@@ -1,62 +1,31 @@
-@model IEnumerable<MiniTrainingCenterCatalog.Mvc.ViewModels.CourseListItemViewModel>
+<div class="text-center">
 
-<h2>Course Catalog</h2>
+    <h1 class="display-4">
 
-<table class="table table-striped table-hover">
+        Mini Training Center Course Catalog
 
-    <thead class="table-dark">
+    </h1>
 
-        <tr>
-            <th>Name</th>
-            <th>Instructor</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
+    <p>
 
-    </thead>
+        ASP.NET Core MVC Project
 
-    <tbody>
+    </p>
 
-    @foreach(var item in Model)
-    {
-        <tr>
+    <a class="btn btn-primary"
+       asp-controller="Courses"
+       asp-action="Index">
 
-            <td>@item.CourseName</td>
+       View Courses
 
-            <td>@item.Instructor</td>
+    </a>
 
-            <td>
+    <a class="btn btn-success"
+       asp-controller="Courses"
+       asp-action="Create">
 
-                @if(item.Status == "Full")
-                {
-                    <span class="badge bg-danger">
-                        Full
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-success">
-                        Available
-                    </span>
-                }
+       Add Course
 
-            </td>
+    </a>
 
-            <td>
-
-                <a class="btn btn-primary btn-sm"
-                   asp-action="Detail"
-                   asp-route-id="@item.Id">
-
-                    Detail
-
-                </a>
-
-            </td>
-
-        </tr>
-    }
-
-    </tbody>
-
-</table>
+</div>

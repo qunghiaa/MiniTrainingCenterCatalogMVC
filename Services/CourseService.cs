@@ -64,4 +64,10 @@ public class CourseService : ICourseService
     {
         return _courses.FirstOrDefault(x => x.Id == id);
     }
+    public void Add(Course course)
+{
+    course.Id = _courses.Max(x => x.Id) + 1;
+
+    _courses.Add(course);
+}
 }
