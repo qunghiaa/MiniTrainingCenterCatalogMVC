@@ -17,4 +17,11 @@ public class Course
     public int EnrolledStudents { get; set; }
 
     public DateTime StartDate { get; set; }
+
+    // Relationship
+    public int CourseCategoryId { get; set; }
+
+    public CourseCategory? CourseCategory { get; set; }
+
+    public List<Enrollment> Enrollments { get; set; } = new();
 }
