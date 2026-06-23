@@ -1,0 +1,41 @@
+@model MiniTrainingCenterCatalog.Mvc.Models.Course
+
+<h2>Archive Course</h2>
+
+<div class="alert alert-danger">
+
+    Are you sure you want to archive this course?
+
+</div>
+
+<table class="table table-bordered">
+
+    <tr>
+        <th>Course Code</th>
+        <td>@Model.CourseCode</td>
+    </tr>
+
+    <tr>
+        <th>Course Name</th>
+        <td>@Model.CourseName</td>
+    </tr>
+
+</table>
+
+<form asp-action="DeleteConfirmed"
+      method="post">
+
+    <input type="hidden"
+           name="id"
+           value="@Model.Id" />
+
+    <button class="btn btn-danger">
+        Archive
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>

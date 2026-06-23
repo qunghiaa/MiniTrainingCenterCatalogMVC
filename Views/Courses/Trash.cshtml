@@ -1,0 +1,52 @@
+@model List<MiniTrainingCenterCatalog.Mvc.Models.Course>
+
+<h2>Archived Courses</h2>
+
+<table class="table table-bordered">
+
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Deleted At</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    @foreach(var item in Model)
+    {
+        <tr>
+
+            <td>@item.CourseCode</td>
+
+            <td>@item.CourseName</td>
+
+            <td>@item.DeletedAt</td>
+
+            <td>
+
+                <form asp-action="Restore"
+                      method="post">
+
+                    <input type="hidden"
+                           name="id"
+                           value="@item.Id" />
+
+                    <button class="btn btn-success btn-sm">
+
+                        Restore
+
+                    </button>
+
+                </form>
+
+            </td>
+
+        </tr>
+    }
+
+    </tbody>
+
+</table>

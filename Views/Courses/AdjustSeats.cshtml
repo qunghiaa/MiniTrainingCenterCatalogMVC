@@ -1,0 +1,49 @@
+@model MiniTrainingCenterCatalog.Mvc.ViewModels.AdjustSeatViewModel
+
+<h2>Adjust Capacity</h2>
+
+<form asp-action="AdjustSeat"
+      method="post">
+
+    <input asp-for="Id" type="hidden" />
+
+    <input asp-for="RowVersion"
+           type="hidden" />
+
+    <div class="mb-3">
+
+        <label>Course</label>
+
+        <input asp-for="CourseName"
+               class="form-control"
+               readonly />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Current Capacity</label>
+
+        <input asp-for="CurrentCapacity"
+               class="form-control"
+               readonly />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="SeatChange"></label>
+
+        <input asp-for="SeatChange"
+               class="form-control" />
+
+        <span asp-validation-for="SeatChange"
+              class="text-danger"></span>
+
+    </div>
+
+    <button class="btn btn-primary">
+        Save
+    </button>
+
+</form>

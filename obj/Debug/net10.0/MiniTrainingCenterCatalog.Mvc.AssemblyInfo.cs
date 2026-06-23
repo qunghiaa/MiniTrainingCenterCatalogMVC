@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MiniTrainingCenterCatalog.Mvc")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+de2bd0fda01077b8870db39179b3abfa02267752")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78a3a875288f08c8de2802a05dc4b6ef8ae9267b")]
 [assembly: System.Reflection.AssemblyProductAttribute("MiniTrainingCenterCatalog.Mvc")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MiniTrainingCenterCatalog.Mvc")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

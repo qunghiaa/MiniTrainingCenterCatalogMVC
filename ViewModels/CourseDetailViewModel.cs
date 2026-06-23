@@ -15,4 +15,8 @@ public class CourseDetailViewModel
     public int EnrolledStudents { get; set; }
 
     public string Status { get; set; } = "";
+
+    public string Level { get; set; } = "";
+
+    public DateTime StartDate { get; set; }
 }

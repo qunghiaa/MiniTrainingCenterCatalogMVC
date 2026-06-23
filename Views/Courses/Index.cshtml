@@ -1,31 +1,123 @@
-<div class="text-center">
+@model IEnumerable<MiniTrainingCenterCatalog.Mvc.ViewModels.CourseListItemViewModel>
 
-    <h1 class="display-4">
+<h2>Course List</h2>
 
-        Mini Training Center Course Catalog
-
-    </h1>
-
-    <p>
-
-        ASP.NET Core MVC Project
-
-    </p>
-
-    <a class="btn btn-primary"
-       asp-controller="Courses"
-       asp-action="Index">
-
-       View Courses
-
+<p>
+    <a asp-action="Create"
+       class="btn btn-success">
+        Create New Course
     </a>
 
-    <a class="btn btn-success"
-       asp-controller="Courses"
-       asp-action="Create">
-
-       Add Course
-
+    <a asp-action="Stats"
+       class="btn btn-info">
+        Statistics
     </a>
 
-</div>
+    <a asp-action="Search"
+       class="btn btn-warning">
+        Search
+    </a>
+
+    <a asp-action="Trash"
+       class="btn btn-danger">
+        Archived Courses
+    </a>
+</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<table class="table table-bordered table-striped">
+
+    <thead>
+
+        <tr>
+            <th>ID</th>
+            <th>Course Name</th>
+            <th>Instructor</th>
+            <th>Status</th>
+            <th width="350">Action</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>@item.Id</td>
+
+                <td>@item.CourseName</td>
+
+                <td>@item.Instructor</td>
+
+                <td>
+
+                    @if (item.Status == "Full")
+                    {
+                        <span class="badge bg-danger">
+                            Full
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">
+                            Available
+                        </span>
+                    }
+
+                </td>
+
+               <td>
+
+    <a asp-action="Detail"
+       asp-route-id="@item.Id"
+       class="btn btn-info btn-sm">
+        Detail
+    </a>
+
+    <a asp-action="Edit"
+       asp-route-id="@item.Id"
+       class="btn btn-warning btn-sm">
+        Edit
+    </a>
+
+    <a asp-action="AdjustSeat"
+       asp-route-id="@item.Id"
+       class="btn btn-secondary btn-sm">
+        Seats
+    </a>
+
+    <a asp-action="Delete"
+       asp-route-id="@item.Id"
+       class="btn btn-danger btn-sm">
+        Archive
+    </a>
+
+</td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">
+        No courses found.
+    </div>
+}

@@ -8,7 +8,8 @@ public class CourseRepository : ICourseRepository
 {
     private readonly AppDbContext _context;
 
-    public CourseRepository(AppDbContext context)
+    public CourseRepository(
+        AppDbContext context)
     {
         _context = context;
     }
@@ -25,12 +26,47 @@ public class CourseRepository : ICourseRepository
     {
         return _context.Courses
             .Include(x => x.CourseCategory)
-            .FirstOrDefault(x => x.Id == id);
+            .FirstOrDefault(x =>
+                x.Id == id);
+    }
+
+    public Course? GetByIdIncludingDeleted(int id)
+    {
+        return _context.Courses
+            .IgnoreQueryFilters()
+            .FirstOrDefault(x =>
+                x.Id == id);
+    }
+
+    public List<Course> GetDeletedCourses()
+    {
+        return _context.Courses
+            .IgnoreQueryFilters()
+            .Where(x => x.IsDeleted)
+            .AsNoTracking()
+            .ToList();
+    }
+
+    public bool CourseCodeExists(
+        string courseCode,
+        int? excludeId = null)
+    {
+        return _context.Courses
+            .IgnoreQueryFilters()
+            .Any(x =>
+                x.CourseCode == courseCode &&
+                (!excludeId.HasValue ||
+                 x.Id != excludeId.Value));
     }
 
     public void Add(Course course)
     {
         _context.Courses.Add(course);
+    }
+
+    public void Update(Course course)
+    {
+        _context.Courses.Update(course);
     }
 
     public void SaveChanges()
