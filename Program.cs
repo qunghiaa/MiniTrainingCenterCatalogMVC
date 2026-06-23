@@ -4,6 +4,12 @@ using MiniTrainingCenterCatalog.Mvc.Data;
 using MiniTrainingCenterCatalog.Mvc.Repositories;
 using MiniTrainingCenterCatalog.Mvc.Options;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<
+    IEnrollmentRepository,
+    EnrollmentRepository>();
+    builder.Services.AddScoped<
+    IEnrollmentService,
+    EnrollmentService>();
 builder.Services.Configure<TrainingCenterSettings>(
     builder.Configuration.GetSection(
         "TrainingCenterSettings"));
@@ -22,8 +28,8 @@ builder.Services.AddScoped<ICourseRepository,
 builder.Services.AddScoped<ICourseDataService,
     CourseDataService>();
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<ICourseService, CourseService>();
-var app = builder.Build();
+builder.Services.AddScoped<ICourseService,
+    CourseService>();var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

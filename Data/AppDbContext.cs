@@ -30,7 +30,10 @@ modelBuilder.Entity<Course>()
             .HasOne(c => c.CourseCategory)
             .WithMany(cc => cc.Courses)
             .HasForeignKey(c => c.CourseCategoryId);
-
+modelBuilder.Entity<Course>()
+    .Property(c => c.Level)
+    .HasMaxLength(50)
+    .IsRequired();
         modelBuilder.Entity<Enrollment>()
             .HasOne(e => e.Student)
             .WithMany(s => s.Enrollments)
@@ -64,12 +67,14 @@ modelBuilder.Entity<Course>().HasData(
         Capacity = 30,
         EnrolledStudents = 20,
         StartDate = new DateTime(2026, 7, 1),
-        CourseCategoryId = 1
+        CourseCategoryId = 1,
+        Level = "Beginner",
     },
 
     new Course
     {
         Id = 2,
+        Level = "Intermediate",
         CourseCode = "WEB001",
         CourseName = "ASP.NET Core MVC",
         Instructor = "Mr. David",
@@ -96,4 +101,5 @@ modelBuilder.Entity<Student>().HasData(
     }
 );
     }
+    
 }

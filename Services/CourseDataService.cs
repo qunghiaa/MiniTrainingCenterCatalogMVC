@@ -17,6 +17,16 @@ public class CourseDataService : ICourseDataService
     _repository = repository;
     _settings = options.Value;
 }
+public List<Course> Filter(
+    int? categoryId,
+    decimal? minFee,
+    decimal? maxFee)
+{
+    return _repository.Filter(
+        categoryId,
+        minFee,
+        maxFee);
+}
 private readonly TrainingCenterSettings _settings;
     public List<Course> GetAllCourses()
     {

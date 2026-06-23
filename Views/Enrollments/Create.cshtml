@@ -1,3 +1,41 @@
 <h2>Course Enrollment</h2>
 
-<p>Lab04 Transaction Demo</p>
+@if (TempData["Success"] != null)
+{
+    <div>
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div>
+        @TempData["Error"]
+    </div>
+}
+
+<form method="post">
+
+    <div>
+        <label>Student Id</label>
+        <input
+            type="number"
+            name="studentId" />
+    </div>
+
+    <br />
+
+    <div>
+        <label>Course Id</label>
+        <input
+            type="number"
+            name="courseId" />
+    </div>
+
+    <br />
+
+    <button type="submit">
+        Register
+    </button>
+
+</form>

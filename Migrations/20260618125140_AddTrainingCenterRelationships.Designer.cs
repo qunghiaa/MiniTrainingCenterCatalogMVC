@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniTrainingCenterCatalog.Mvc.Data;
 
@@ -11,9 +12,11 @@ using MiniTrainingCenterCatalog.Mvc.Data;
 namespace MiniTrainingCenterCatalog.Mvc.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260618125140_AddTrainingCenterRelationships")]
+    partial class AddTrainingCenterRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,11 +58,6 @@ namespace MiniTrainingCenterCatalog.Mvc.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Level")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -80,7 +78,6 @@ namespace MiniTrainingCenterCatalog.Mvc.Migrations
                             EnrolledStudents = 20,
                             Fee = 1500000m,
                             Instructor = "Mr. John",
-                            Level = "Beginner",
                             StartDate = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -93,7 +90,6 @@ namespace MiniTrainingCenterCatalog.Mvc.Migrations
                             EnrolledStudents = 18,
                             Fee = 2000000m,
                             Instructor = "Mr. David",
-                            Level = "Intermediate",
                             StartDate = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });

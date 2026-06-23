@@ -1,5 +1,5 @@
 namespace MiniTrainingCenterCatalog.Mvc.Models;
-
+using System.ComponentModel.DataAnnotations;
 public class Course
 {
     public int Id { get; set; }
@@ -18,10 +18,12 @@ public class Course
 
     public DateTime StartDate { get; set; }
 
-    // Relationship
     public int CourseCategoryId { get; set; }
 
     public CourseCategory? CourseCategory { get; set; }
 
-    public List<Enrollment> Enrollments { get; set; } = new();
+    public ICollection<Enrollment> Enrollments { get; set; }
+        = new List<Enrollment>();
+        public string Level { get; set; } = "";
+        
 }

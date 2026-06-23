@@ -8,5 +8,6 @@ public class Student
 
     public string Email { get; set; } = "";
 
-    public List<Enrollment> Enrollments { get; set; } = new();
+    public ICollection<Enrollment> Enrollments { get; set; }
+        = new List<Enrollment>();
 }

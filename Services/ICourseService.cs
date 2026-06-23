@@ -9,4 +9,11 @@ public interface ICourseService
     Course? GetById(int id);
 
     void Add(Course course);
+
+    bool IsLowSeat(Course course);
+
+    List<Course> Filter(
+        int? categoryId,
+        decimal? minFee,
+        decimal? maxFee);
 }

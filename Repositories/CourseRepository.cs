@@ -27,4 +27,46 @@ public class CourseRepository : ICourseRepository
             .Include(x => x.CourseCategory)
             .FirstOrDefault(x => x.Id == id);
     }
+
+    public void Add(Course course)
+    {
+        _context.Courses.Add(course);
+    }
+
+    public void SaveChanges()
+    {
+        _context.SaveChanges();
+    }
+
+    public List<Course> Filter(
+        int? categoryId,
+        decimal? minFee,
+        decimal? maxFee)
+    {
+        var query = _context.Courses
+            .Include(x => x.CourseCategory)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (categoryId.HasValue)
+        {
+            query = query.Where(x =>
+                x.CourseCategoryId ==
+                categoryId.Value);
+        }
+
+        if (minFee.HasValue)
+        {
+            query = query.Where(x =>
+                x.Fee >= minFee.Value);
+        }
+
+        if (maxFee.HasValue)
+        {
+            query = query.Where(x =>
+                x.Fee <= maxFee.Value);
+        }
+
+        return query.ToList();
+    }
 }

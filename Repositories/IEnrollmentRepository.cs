@@ -4,7 +4,7 @@ namespace MiniTrainingCenterCatalog.Mvc.Repositories;
 
 public interface IEnrollmentRepository
 {
-    Task CreateEnrollmentAsync(
-        int studentId,
-        int courseId);
+    void Add(Enrollment enrollment);
+
+    void SaveChanges();
 }
