@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2>Training Center Dashboard</h2>
+
+<div class="row">
+
+    <div class="col-md-3">
+
+        <div class="card bg-primary text-white">
+
+            <div class="card-body">
+
+                <h5>Total Courses</h5>
+
+                <h2>@ViewBag.Total</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card bg-success text-white">
+
+            <div class="card-body">
+
+                <h5>Available</h5>
+
+                <h2>@ViewBag.Available</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card bg-danger text-white">
+
+            <div class="card-body">
+
+                <h5>Full</h5>
+
+                <h2>@ViewBag.Full</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card bg-warning">
+
+            <div class="card-body">
+
+                <h5>Revenue</h5>
+
+                <h2>@String.Format("{0:N0}", ViewBag.Revenue)</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

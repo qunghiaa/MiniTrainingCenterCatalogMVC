@@ -50,4 +50,5 @@ public class Course
 
     [Timestamp]
     public byte[] RowVersion { get; set; } = Array.Empty<byte>();
+    public string? ThumbnailPath { get; set; }
 }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniTrainingCenterCatalog.Mvc.Models;
@@ -6,16 +7,20 @@ using MiniTrainingCenterCatalog.Mvc.ViewModels;
 
 namespace MiniTrainingCenterCatalog.Mvc.Controllers;
 
+[Authorize(Policy = "CanViewCourse")]
+[Authorize]
 public class CoursesController : Controller
 {
     private readonly ICourseService _service;
+    private IAuditService _audit;
 
     public CoursesController(
-        ICourseService service)
-    {
-        _service = service;
-    }
-
+    ICourseService service,
+    IAuditService audit)
+{
+    _service = service;
+    _audit = audit;
+}
     // =========================
     // INDEX
     // =========================
@@ -23,17 +28,15 @@ public class CoursesController : Controller
     public IActionResult Index()
     {
         var vm = _service.GetAll()
-            .Select(c =>
-                new CourseListItemViewModel
-                {
-                    Id = c.Id,
-                    CourseName = c.CourseName,
-                    Instructor = c.Instructor,
-                    Status =
-                        c.EnrolledStudents >= c.Capacity
-                        ? "Full"
-                        : "Available"
-                });
+            .Select(c => new CourseListItemViewModel
+            {
+                Id = c.Id,
+                CourseName = c.CourseName,
+                Instructor = c.Instructor,
+                Status = c.EnrolledStudents >= c.Capacity
+                    ? "Full"
+                    : "Available"
+            });
 
         return View(vm);
     }
@@ -44,51 +47,44 @@ public class CoursesController : Controller
 
     public IActionResult Detail(int id)
     {
-        var course =
-            _service.GetById(id);
+        var course = _service.GetById(id);
 
         if (course == null)
             return NotFound();
 
-        return View(
-            new CourseDetailViewModel
-            {
-                CourseCode = course.CourseCode,
-                CourseName = course.CourseName,
-                Instructor = course.Instructor,
-                Fee = course.Fee,
-                Capacity = course.Capacity,
-                EnrolledStudents =
-                    course.EnrolledStudents,
-                Status =
-                    course.EnrolledStudents >=
-                    course.Capacity
-                        ? "Full"
-                        : "Available"
-            });
+        return View(new CourseDetailViewModel
+        {
+            CourseCode = course.CourseCode,
+            CourseName = course.CourseName,
+            Instructor = course.Instructor,
+            Fee = course.Fee,
+            Capacity = course.Capacity,
+            EnrolledStudents = course.EnrolledStudents,
+            Status = course.EnrolledStudents >= course.Capacity
+                ? "Full"
+                : "Available"
+        });
     }
 
     // =========================
     // CREATE
     // =========================
 
-    [HttpGet]
-    public IActionResult Create()
+    [Authorize(Roles="Admin")]
+public IActionResult Create()
     {
         return View();
     }
 
-    [HttpPost]
-    public IActionResult Create(
-        CourseCreateViewModel vm)
+  [Authorize(Roles="Admin")]
+[HttpPost]
+
+    public IActionResult Create(CourseCreateViewModel vm)
     {
         if (!ModelState.IsValid)
-        {
             return View(vm);
-        }
 
-        if (_service.CourseCodeExists(
-            vm.CourseCode))
+        if (_service.CourseCodeExists(vm.CourseCode))
         {
             ModelState.AddModelError(
                 nameof(vm.CourseCode),
@@ -110,64 +106,65 @@ public class CoursesController : Controller
         };
 
         _service.Add(course);
+        _audit.Write(
+    User.Identity!.Name!,
+    "CREATE",
+    "Course",
+    $"Created {course.CourseCode}");
 
-        TempData["Success"] =
-            "Course created successfully.";
+        TempData["Success"] = "Course created successfully.";
 
-        return RedirectToAction(
-            nameof(Index));
+        return RedirectToAction(nameof(Index));
     }
 
     // =========================
     // EDIT
     // =========================
 
+[Authorize(Roles="Admin")]
     [HttpGet]
     public IActionResult Edit(int id)
     {
-        var course =
-            _service.GetById(id);
+        var course = _service.GetById(id);
 
         if (course == null)
             return NotFound();
 
-        return View(
-            new CourseEditViewModel
-            {
-                Id = course.Id,
-                CourseCode = course.CourseCode,
-                CourseName = course.CourseName,
-                Instructor = course.Instructor,
-                Fee = course.Fee,
-                Capacity = course.Capacity,
-                RowVersion = course.RowVersion
-            });
+        return View(new CourseEditViewModel
+        {
+            Id = course.Id,
+            CourseCode = course.CourseCode,
+            CourseName = course.CourseName,
+            Instructor = course.Instructor,
+            Fee = course.Fee,
+            Capacity = course.Capacity,
+            RowVersion = course.RowVersion
+        });
     }
 
-    [HttpPost]
-    public IActionResult Edit(
-        CourseEditViewModel vm)
+[Authorize(Roles="Admin")]
+        [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(CourseEditViewModel vm)
     {
         if (!ModelState.IsValid)
-        {
             return View(vm);
-        }
 
         try
         {
             _service.Update(vm);
+_audit.Write(
+    User.Identity!.Name!,
+    "EDIT",
+    "Course",
+    $"Edited {vm.CourseCode}");
+            TempData["Success"] = "Course updated.";
 
-            TempData["Success"] =
-                "Course updated.";
-
-            return RedirectToAction(
-                nameof(Index));
+            return RedirectToAction(nameof(Index));
         }
-        catch (
-            DbUpdateConcurrencyException)
+        catch (DbUpdateConcurrencyException)
         {
-            ModelState.AddModelError(
-                "",
+            ModelState.AddModelError("",
                 "This record was modified by another user.");
 
             return View(vm);
@@ -178,12 +175,11 @@ public class CoursesController : Controller
     // DELETE
     // =========================
 
+[Authorize(Roles="Admin")]
     [HttpGet]
-    public IActionResult Delete(
-        int id)
+    public IActionResult Delete(int id)
     {
-        var course =
-            _service.GetById(id);
+        var course = _service.GetById(id);
 
         if (course == null)
             return NotFound();
@@ -191,17 +187,19 @@ public class CoursesController : Controller
         return View(course);
     }
 
-    [HttpPost]
-    public IActionResult DeleteConfirmed(
-        int id)
+[Authorize(Roles="Admin")]    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteConfirmed(int id)
     {
         _service.SoftDelete(id);
+_audit.Write(
+    User.Identity!.Name!,
+    "DELETE",
+    "Course",
+    $"Archive course {id}");
+        TempData["Success"] = "Course archived.";
 
-        TempData["Success"] =
-            "Course archived.";
-
-        return RedirectToAction(
-            nameof(Index));
+        return RedirectToAction(nameof(Index));
     }
 
     // =========================
@@ -210,86 +208,77 @@ public class CoursesController : Controller
 
     public IActionResult Trash()
     {
-        return View(
-            _service.GetDeletedCourses());
+        return View(_service.GetDeletedCourses());
     }
 
     // =========================
     // RESTORE
     // =========================
 
+[Authorize(Roles="Admin")]
     [HttpPost]
-    public IActionResult Restore(
-        int id)
+    [ValidateAntiForgeryToken]
+    public IActionResult Restore(int id)
     {
         _service.Restore(id);
+_audit.Write(
+    User.Identity!.Name!,
+    "RESTORE",
+    "Course",
+    $"Restore course {id}");
+        TempData["Success"] = "Course restored.";
 
-        TempData["Success"] =
-            "Course restored.";
-
-        return RedirectToAction(
-            nameof(Trash));
+        return RedirectToAction(nameof(Trash));
     }
 
     // =========================
     // ADJUST SEAT
     // =========================
 
+[Authorize(Policy="StaffOnly")]
     [HttpGet]
-    public IActionResult AdjustSeat(
-        int id)
+    public IActionResult AdjustSeat(int id)
     {
-        var course =
-            _service.GetById(id);
+        var course = _service.GetById(id);
 
         if (course == null)
             return NotFound();
 
-        return View(
-            new AdjustSeatViewModel
-            {
-                Id = course.Id,
-                CourseName =
-                    course.CourseName,
-                CurrentCapacity =
-                    course.Capacity,
-                RowVersion =
-                    course.RowVersion
-            });
+        return View(new AdjustSeatViewModel
+        {
+            Id = course.Id,
+            CourseName = course.CourseName,
+            CurrentCapacity = course.Capacity,
+            RowVersion = course.RowVersion
+        });
     }
 
+[Authorize(Policy="StaffOnly")]
     [HttpPost]
-    public IActionResult AdjustSeat(
-        AdjustSeatViewModel vm)
+    [ValidateAntiForgeryToken]
+    public IActionResult AdjustSeat(AdjustSeatViewModel vm)
     {
         if (!ModelState.IsValid)
-        {
             return View(vm);
-        }
 
         try
         {
             _service.AdjustSeats(vm);
 
-            TempData["Success"] =
-                "Capacity updated.";
+            TempData["Success"] = "Capacity updated.";
 
-            return RedirectToAction(
-                nameof(Index));
+            return RedirectToAction(nameof(Index));
         }
-        catch (
-            DbUpdateConcurrencyException)
+        catch (DbUpdateConcurrencyException)
         {
-            ModelState.AddModelError(
-                "",
+            ModelState.AddModelError("",
                 "Concurrency conflict detected.");
 
             return View(vm);
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError(
-                "",
+            ModelState.AddModelError("",
                 ex.Message);
 
             return View(vm);
@@ -302,32 +291,25 @@ public class CoursesController : Controller
 
     [HttpGet]
     [Route("api/courses/{id}")]
-    public IActionResult GetCourseApi(
-        int id)
+    [AllowAnonymous]
+    public IActionResult GetCourseApi(int id)
     {
-        var course =
-            _service.GetById(id);
+        var course = _service.GetById(id);
 
         if (course == null)
         {
-            return NotFound(
-                new ProblemDetails
+            return NotFound(new ProblemDetails
+            {
+                Title = "Course Not Found",
+                Detail = $"Course {id} does not exist.",
+                Status = 404,
+                Instance = HttpContext.Request.Path,
+                Extensions =
                 {
-                    Title =
-                        "Course Not Found",
-                    Detail =
-                        $"Course {id} does not exist.",
-                    Status = 404,
-                    Instance =
-                        HttpContext.Request.Path,
-                    Extensions =
-                    {
-                        ["traceId"] =
-                            HttpContext.TraceIdentifier,
-                        ["errorCode"] =
-                            "COURSE_NOT_FOUND"
-                    }
-                });
+                    ["traceId"] = HttpContext.TraceIdentifier,
+                    ["errorCode"] = "COURSE_NOT_FOUND"
+                }
+            });
         }
 
         return Json(course);
@@ -336,32 +318,18 @@ public class CoursesController : Controller
     // =========================
     // STATS
     // =========================
+[Authorize(Policy="StaffOnly")]
 
     public IActionResult Stats()
     {
-        var courses =
-            _service.GetAll();
+        var courses = _service.GetAll();
 
-        return View(
-            new CourseStatsViewModel
-            {
-                TotalCourses =
-                    courses.Count,
-
-                FullCourses =
-                    courses.Count(x =>
-                        x.EnrolledStudents >=
-                        x.Capacity),
-
-                AvailableCourses =
-                    courses.Count(x =>
-                        x.EnrolledStudents <
-                        x.Capacity),
-
-                TotalRevenue =
-                    courses.Sum(x =>
-                        x.Fee *
-                        x.EnrolledStudents)
-            });
+        return View(new CourseStatsViewModel
+        {
+            TotalCourses = courses.Count,
+            FullCourses = courses.Count(x => x.EnrolledStudents >= x.Capacity),
+            AvailableCourses = courses.Count(x => x.EnrolledStudents < x.Capacity),
+            TotalRevenue = courses.Sum(x => x.Fee * x.EnrolledStudents)
+        });
     }
 }

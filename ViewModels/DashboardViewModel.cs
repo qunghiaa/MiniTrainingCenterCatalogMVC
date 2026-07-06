@@ -6,7 +6,11 @@ public class DashboardViewModel
 
     public int ActiveCourses { get; set; }
 
-    public int DeletedCourses { get; set; }
+    public int ArchivedCourses { get; set; }
 
-    public int LowSeatCourses { get; set; }
+    public int TotalStudents { get; set; }
+
+    public int TotalEnrollments { get; set; }
+
+    public decimal TotalRevenue { get; set; }
 }

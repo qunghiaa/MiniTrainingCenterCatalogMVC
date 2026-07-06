@@ -1,0 +1,43 @@
+@model IEnumerable<MiniTrainingCenterCatalog.Mvc.Models.AuditLog>
+
+<h2>Audit Logs</h2>
+
+<table class="table table-bordered table-striped">
+
+    <thead>
+
+        <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Entity</th>
+            <th>Entity Id</th>
+            <th>Description</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+@foreach(var item in Model)
+{
+    <tr>
+
+        <td>@item.CreatedAt</td>
+
+        <td>@item.UserName</td>
+
+        <td>@item.Action</td>
+
+        <td>@item.EntityName</td>
+
+        <td>@item.EntityId</td>
+
+        <td>@item.Description</td>
+
+    </tr>
+}
+
+    </tbody>
+
+</table>

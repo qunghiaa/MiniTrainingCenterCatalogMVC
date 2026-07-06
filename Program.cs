@@ -3,6 +3,8 @@ using MiniTrainingCenterCatalog.Mvc.Data;
 using MiniTrainingCenterCatalog.Mvc.Options;
 using MiniTrainingCenterCatalog.Mvc.Repositories;
 using MiniTrainingCenterCatalog.Mvc.Services;
+using Microsoft.AspNetCore.Identity;
+using MiniTrainingCenterCatalog.Mvc.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +21,53 @@ builder.Services.AddDbContext<AppDbContext>(
             builder.Configuration.GetConnectionString(
                 "DefaultConnection"));
     });
+builder.Services
+    .AddIdentity<
+        ApplicationUser,
+        IdentityRole>()
+    .AddEntityFrameworkStores<
+        AppDbContext>()
+    .AddDefaultTokenProviders();
 
+    builder.Services.ConfigureApplicationCookie(
+    options =>
+    {
+        options.LoginPath =
+            "/Account/Login";
+
+        options.AccessDeniedPath =
+            "/Account/AccessDenied";
+    });
+    builder.Services.AddAuthorization(
+    options =>
+    {
+        options.AddPolicy(
+            "CanManageCourse",
+            p =>
+                p.RequireRole("Admin"));
+
+        options.AddPolicy(
+            "CanViewCourse",
+            p =>
+                p.RequireRole(
+                    "Admin",
+                    "Staff"));
+
+        options.AddPolicy(
+            "CanViewAuditLog",
+            p =>
+                p.RequireRole(
+                    "Admin"));
+
+        options.AddPolicy(
+            "CanUploadCourseImage",
+            p =>
+                p.RequireRole(
+                    "Admin"));
+    });
+    builder.Services.AddScoped<
+    IAuditLogService,
+    AuditLogService>();
 builder.Services
     .AddHealthChecks()
     .AddDbContextCheck<AppDbContext>(
@@ -32,7 +80,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ICourseService,
     CourseService>();
-
+builder.Services.AddScoped<
+    IAuditService,
+    AuditService>();
 builder.Services.AddScoped<
     ICourseDataService,
     CourseDataService>();
@@ -63,7 +113,7 @@ else
 app.UseHttpsRedirection();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHealthChecks("/health/live");
@@ -77,5 +127,18 @@ app.MapControllerRoute(
     pattern:
     "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+using (var scope =
+    app.Services.CreateScope())
+{
+    await IdentitySeeder.SeedAsync(
+        scope.ServiceProvider);
+}
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
 
+    await SeedRoles.InitializeAsync(services);
+
+    await SeedAdmin.InitializeAsync(services);
+}
 app.Run();
