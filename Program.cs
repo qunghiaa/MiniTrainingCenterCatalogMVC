@@ -4,11 +4,14 @@ using MiniTrainingCenterCatalog.Mvc.Options;
 using MiniTrainingCenterCatalog.Mvc.Repositories;
 using MiniTrainingCenterCatalog.Mvc.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MiniTrainingCenterCatalog.Mvc.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddProblemDetails();
 
 builder.Services.Configure<TrainingCenterSettings>(
     builder.Configuration.GetSection(
@@ -38,7 +41,20 @@ builder.Services
         options.AccessDeniedPath =
             "/Account/AccessDenied";
     });
-    builder.Services.AddAuthorization(
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 8;
+    options.User.RequireUniqueEmail = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+});
+
+builder.Services.AddAuthorization(
     options =>
     {
         options.AddPolicy(
@@ -48,6 +64,13 @@ builder.Services
 
         options.AddPolicy(
             "CanViewCourse",
+            p =>
+                p.RequireRole(
+                    "Admin",
+                    "Staff"));
+
+        options.AddPolicy(
+            "CanAdjustCourseSeats",
             p =>
                 p.RequireRole(
                     "Admin",
@@ -70,8 +93,13 @@ builder.Services
     AuditLogService>();
 builder.Services
     .AddHealthChecks()
+    .AddCheck(
+        "self",
+        () => HealthCheckResult.Healthy(),
+        tags: new[] { "live" })
     .AddDbContextCheck<AppDbContext>(
-        name: "database");
+        name: "database",
+        tags: new[] { "ready" });
 
 builder.Services.AddScoped<
     ICourseRepository,
@@ -80,6 +108,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ICourseService,
     CourseService>();
+builder.Services.AddScoped<
+    IFileUploadService,
+    FileUploadService>();
 builder.Services.AddScoped<
     IAuditService,
     AuditService>();
@@ -111,14 +142,45 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStatusCodePagesWithReExecute("/Home/ErrorStatusCode", "?code={0}");
 
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHealthChecks("/health/live");
+app.MapHealthChecks(
+    "/health/live",
+    new HealthCheckOptions
+    {
+        Predicate = check =>
+            check.Tags.Contains("live")
+    });
 
-app.MapHealthChecks("/health/ready");
+app.MapHealthChecks(
+    "/health/ready",
+    new HealthCheckOptions
+    {
+        Predicate = check =>
+            check.Tags.Contains("ready"),
+        ResponseWriter = async (context, report) =>
+        {
+            context.Response.ContentType = "application/json";
+
+            var response = new
+            {
+                status = report.Status.ToString(),
+                checks = report.Entries.Select(entry => new
+                {
+                    name = entry.Key,
+                    status = entry.Value.Status.ToString(),
+                    description = entry.Value.Description
+                }),
+                totalDuration = report.TotalDuration.TotalMilliseconds
+            };
+
+            await context.Response.WriteAsJsonAsync(response);
+        }
+    });
 
 app.MapStaticAssets();
 

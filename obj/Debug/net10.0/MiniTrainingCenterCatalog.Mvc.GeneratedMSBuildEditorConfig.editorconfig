@@ -95,6 +95,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBY2Nlc3NEZW5pZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/nghia/OneDrive - VNU-HCMUS/Desktop/lab2/lab02/MiniTrainingCenterCatalog.Mvc/Views/Home/ErrorStatusCode.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxFcnJvclN0YXR1c0NvZGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/nghia/OneDrive - VNU-HCMUS/Desktop/lab2/lab02/MiniTrainingCenterCatalog.Mvc/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -109,6 +113,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/nghia/OneDrive - VNU-HCMUS/Desktop/lab2/lab02/MiniTrainingCenterCatalog.Mvc/Views/Shared/_CourseCard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Db3Vyc2VDYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nghia/OneDrive - VNU-HCMUS/Desktop/lab2/lab02/MiniTrainingCenterCatalog.Mvc/Views/Shared/_LoginPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/nghia/OneDrive - VNU-HCMUS/Desktop/lab2/lab02/MiniTrainingCenterCatalog.Mvc/Views/Shared/_ValidationScriptsPartial.cshtml]

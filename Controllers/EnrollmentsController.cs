@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using MiniTrainingCenterCatalog.Mvc.Services;
 
 namespace MiniTrainingCenterCatalog.Mvc.Controllers;
@@ -14,12 +15,15 @@ public class EnrollmentsController : Controller
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult Create()
     {
         return View();
     }
 
     [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
     public IActionResult Create(
         int studentId,
         int courseId)

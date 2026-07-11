@@ -12,6 +12,11 @@ public interface ICourseRepository
 
     List<Course> GetDeletedCourses();
 
+    List<Course> Search(
+        string? keyword,
+        string? instructor,
+        decimal? minFee);
+
     bool CourseCodeExists(
         string courseCode,
         int? excludeId = null);
@@ -19,6 +24,10 @@ public interface ICourseRepository
     void Add(Course course);
 
     void Update(Course course);
+
+    void SetOriginalRowVersion(
+        Course course,
+        byte[] rowVersion);
 
     void SaveChanges();
 

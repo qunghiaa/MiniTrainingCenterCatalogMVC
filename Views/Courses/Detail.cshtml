@@ -2,6 +2,30 @@
 
 <h2>Course Detail</h2>
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.ThumbnailPath))
+{
+    <div class="mb-3">
+        <img src="@Model.ThumbnailPath"
+             alt="@Model.CourseName"
+             class="img-thumbnail"
+             style="max-width: 240px;" />
+    </div>
+}
+
 <table class="table table-bordered">
 
 <tr>
@@ -39,7 +63,44 @@
     <td>@Model.Status</td>
 </tr>
 
+<tr>
+    <th>Level</th>
+    <td>@Model.Level</td>
+</tr>
+
+<tr>
+    <th>Start Date</th>
+    <td>@Model.StartDate.ToString("yyyy-MM-dd")</td>
+</tr>
+
 </table>
+
+@if (User.IsInRole("Admin"))
+{
+    <form asp-action="UploadImage"
+          asp-route-id="@Model.Id"
+          method="post"
+          enctype="multipart/form-data"
+          class="mb-3">
+
+        @Html.AntiForgeryToken()
+
+        <label for="image" class="form-label">
+            Replace course image
+        </label>
+
+        <input id="image"
+               name="image"
+               type="file"
+               class="form-control mb-2"
+               accept=".jpg,.jpeg,.png,.gif,.webp" />
+
+        <button class="btn btn-primary">
+            Upload Image
+        </button>
+
+    </form>
+}
 
 <a class="btn btn-secondary"
    asp-action="Index">

@@ -30,6 +30,8 @@
                 <form asp-action="Restore"
                       method="post">
 
+                    @Html.AntiForgeryToken()
+
                     <input type="hidden"
                            name="id"
                            value="@item.Id" />

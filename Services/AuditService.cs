@@ -17,7 +17,10 @@ public class AuditService : IAuditService
         string username,
         string action,
         string entity,
-        string description)
+        string description,
+        string entityId = "",
+        string result = "Success",
+        string traceId = "")
     {
         _context.AuditLogs.Add(
             new AuditLog
@@ -25,8 +28,11 @@ public class AuditService : IAuditService
                 UserName = username,
                 Action = action,
                 EntityName = entity,
+                EntityId = entityId,
+                Result = result,
+                TraceId = traceId,
                 Description = description,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             });
 
         _context.SaveChanges();

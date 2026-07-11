@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using MiniTrainingCenterCatalog.Mvc.Models;
 using MiniTrainingCenterCatalog.Mvc.ViewModels;
 
@@ -13,6 +14,11 @@ public interface ICourseService
 
     List<Course> GetDeletedCourses();
 
+    List<Course> Search(
+        string? keyword,
+        string? instructor,
+        decimal? minFee);
+
     void Add(Course course);
 
     void Update(CourseEditViewModel vm);
@@ -23,6 +29,10 @@ public interface ICourseService
 
     void AdjustSeats(
         AdjustSeatViewModel vm);
+
+    Task<FileUploadResult> ReplaceThumbnailAsync(
+        int id,
+        IFormFile file);
 
     bool IsLowSeat(Course course);
 

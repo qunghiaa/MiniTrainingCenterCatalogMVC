@@ -22,8 +22,10 @@
 
 </table>
 
-<form asp-action="DeleteConfirmed"
+<form asp-action="Delete"
       method="post">
+
+    @Html.AntiForgeryToken()
 
     <input type="hidden"
            name="id"

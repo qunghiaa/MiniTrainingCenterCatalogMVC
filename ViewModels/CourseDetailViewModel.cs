@@ -2,6 +2,8 @@ namespace MiniTrainingCenterCatalog.Mvc.ViewModels;
 
 public class CourseDetailViewModel
 {
+    public int Id { get; set; }
+
     public string CourseCode { get; set; } = "";
 
     public string CourseName { get; set; } = "";
@@ -19,4 +21,6 @@ public class CourseDetailViewModel
     public string Level { get; set; } = "";
 
     public DateTime StartDate { get; set; }
+
+    public string? ThumbnailPath { get; set; }
 }

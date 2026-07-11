@@ -1,43 +1,80 @@
-@model IEnumerable<MiniTrainingCenterCatalog.Mvc.Models.AuditLog>
+@model MiniTrainingCenterCatalog.Mvc.ViewModels.AuditLogSearchViewModel
 
 <h2>Audit Logs</h2>
 
-<table class="table table-bordered table-striped">
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-2">
+        <label asp-for="UserName" class="form-label"></label>
+        <input asp-for="UserName" class="form-control" />
+    </div>
 
-    <thead>
+    <div class="col-md-2">
+        <label asp-for="Action" class="form-label"></label>
+        <input asp-for="Action" class="form-control" />
+    </div>
 
-        <tr>
-            <th>Time</th>
-            <th>User</th>
-            <th>Action</th>
-            <th>Entity</th>
-            <th>Entity Id</th>
-            <th>Description</th>
-        </tr>
+    <div class="col-md-2">
+        <label asp-for="Result" class="form-label"></label>
+        <select asp-for="Result" class="form-select">
+            <option value="">All</option>
+            <option>Success</option>
+            <option>Failed</option>
+        </select>
+    </div>
 
-    </thead>
+    <div class="col-md-2">
+        <label asp-for="FromDate" class="form-label"></label>
+        <input asp-for="FromDate" type="date" class="form-control" />
+    </div>
 
-    <tbody>
+    <div class="col-md-2">
+        <label asp-for="ToDate" class="form-label"></label>
+        <input asp-for="ToDate" type="date" class="form-control" />
+    </div>
 
-@foreach(var item in Model)
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100">
+            Search
+        </button>
+    </div>
+</form>
+
+@if (!Model.Logs.Any())
 {
-    <tr>
-
-        <td>@item.CreatedAt</td>
-
-        <td>@item.UserName</td>
-
-        <td>@item.Action</td>
-
-        <td>@item.EntityName</td>
-
-        <td>@item.EntityId</td>
-
-        <td>@item.Description</td>
-
-    </tr>
+    <div class="alert alert-warning">
+        No audit logs match the selected filters.
+    </div>
 }
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Entity Id</th>
+                <th>Result</th>
+                <th>Trace Id</th>
+                <th>Description</th>
+            </tr>
+        </thead>
 
-    </tbody>
-
-</table>
+        <tbody>
+        @foreach (var item in Model.Logs)
+        {
+            <tr>
+                <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>@item.UserName</td>
+                <td>@item.Action</td>
+                <td>@item.EntityName</td>
+                <td>@item.EntityId</td>
+                <td>@item.Result</td>
+                <td>@item.TraceId</td>
+                <td>@item.Description</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

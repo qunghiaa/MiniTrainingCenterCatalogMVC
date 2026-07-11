@@ -8,5 +8,6 @@ public interface IAuditLogService
         string entityName,
         string entityId,
         string result,
-        string traceId);
+        string traceId,
+        string description = "");
 }

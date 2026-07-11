@@ -12,7 +12,7 @@ public static class SeedAdmin
             serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
         const string email =
-            "admin@training.com";
+            "admin@example.com";
 
         var user =
             await userManager.FindByEmailAsync(email);
@@ -30,7 +30,7 @@ public static class SeedAdmin
             var result =
                 await userManager.CreateAsync(
                     user,
-                    "Admin@123");
+                    "Password@123");
 
             if (result.Succeeded)
             {

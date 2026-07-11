@@ -20,7 +20,8 @@ public class AuditLogService
         string entityName,
         string entityId,
         string result,
-        string traceId)
+        string traceId,
+        string description = "")
     {
         _context.AuditLogs.Add(
             new AuditLog
@@ -31,6 +32,7 @@ public class AuditLogService
                 EntityId = entityId,
                 Result = result,
                 TraceId = traceId,
+                Description = description,
                 CreatedAt =
                     DateTime.UtcNow
             });

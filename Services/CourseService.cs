@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MiniTrainingCenterCatalog.Mvc.Models;
@@ -16,14 +17,18 @@ public class CourseService : ICourseService
 
     private readonly ILogger<CourseService> _logger;
 
+    private readonly IFileUploadService _fileUploadService;
+
     public CourseService(
         ICourseRepository repository,
         IOptions<TrainingCenterSettings> options,
-        ILogger<CourseService> logger)
+        ILogger<CourseService> logger,
+        IFileUploadService fileUploadService)
     {
         _repository = repository;
         _settings = options.Value;
         _logger = logger;
+        _fileUploadService = fileUploadService;
     }
 
     public List<Course> GetAll()
@@ -47,6 +52,17 @@ public class CourseService : ICourseService
     {
         return _repository
             .GetDeletedCourses();
+    }
+
+    public List<Course> Search(
+        string? keyword,
+        string? instructor,
+        decimal? minFee)
+    {
+        return _repository.Search(
+            keyword,
+            instructor,
+            minFee);
     }
 
     public bool CourseCodeExists(
@@ -106,8 +122,9 @@ public class CourseService : ICourseService
         course.UpdatedAt =
             DateTime.UtcNow;
 
-        course.RowVersion =
-            vm.RowVersion;
+        _repository.SetOriginalRowVersion(
+            course,
+            vm.RowVersion);
 
         try
         {
@@ -186,13 +203,19 @@ public class CourseService : ICourseService
         }
 
         var newCapacity =
-    course.Capacity +
-    vm.SeatChange;
+            course.Capacity +
+            vm.SeatChange;
 
-        if (newCapacity < 0)
+        if (newCapacity < course.EnrolledStudents)
         {
             throw new Exception(
-                "Capacity cannot be negative");
+                "Capacity cannot be lower than enrolled students.");
+        }
+
+        if (newCapacity < 1)
+        {
+            throw new Exception(
+                "Capacity must be at least 1.");
         }
 
         course.Capacity =
@@ -201,8 +224,9 @@ public class CourseService : ICourseService
         course.UpdatedAt =
             DateTime.UtcNow;
 
-        course.RowVersion =
-            vm.RowVersion;
+        _repository.SetOriginalRowVersion(
+            course,
+            vm.RowVersion);
 
         try
         {
@@ -220,6 +244,55 @@ public class CourseService : ICourseService
             _logger.LogWarning(
                 "Concurrency conflict while adjusting seat. CourseId={Id}",
                 course.Id);
+
+            throw;
+        }
+    }
+
+    public async Task<FileUploadResult> ReplaceThumbnailAsync(
+        int id,
+        IFormFile file)
+    {
+        var course = _repository.GetById(id);
+
+        if (course == null)
+        {
+            return new FileUploadResult
+            {
+                Succeeded = false,
+                ErrorMessage = "Course not found."
+            };
+        }
+
+        var oldPath = course.ThumbnailPath;
+        var uploadResult =
+            await _fileUploadService.SaveCourseThumbnailAsync(file);
+
+        if (!uploadResult.Succeeded)
+        {
+            return uploadResult;
+        }
+
+        try
+        {
+            course.ThumbnailPath = uploadResult.PublicPath;
+            course.UpdatedAt = DateTime.UtcNow;
+
+            _repository.Update(course);
+            _repository.SaveChanges();
+
+            _fileUploadService.DeletePublicFile(oldPath);
+
+            _logger.LogInformation(
+                "Course thumbnail replaced. Id={Id}",
+                id);
+
+            return uploadResult;
+        }
+        catch
+        {
+            _fileUploadService.DeletePublicFile(
+                uploadResult.PublicPath);
 
             throw;
         }

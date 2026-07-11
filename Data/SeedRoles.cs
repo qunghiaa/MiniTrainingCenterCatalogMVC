@@ -13,8 +13,8 @@ public static class SeedRoles
         string[] roles =
         {
             "Admin",
-            "Manager",
-            "Staff"
+            "Staff",
+            "User"
         };
 
         foreach (var role in roles)

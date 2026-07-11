@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MiniTrainingCenterCatalog.Mvc")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5a95c98c00c2c9bd0842023656cb6306258b507")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aeb6c5c8d92f980d5791c9662ec39660204ab509")]
 [assembly: System.Reflection.AssemblyProductAttribute("MiniTrainingCenterCatalog.Mvc")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MiniTrainingCenterCatalog.Mvc")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

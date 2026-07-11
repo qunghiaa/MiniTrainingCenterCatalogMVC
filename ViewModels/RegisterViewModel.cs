@@ -14,7 +14,8 @@ public class RegisterViewModel
 
     [Required]
     [DataType(DataType.Password)]
-    [StringLength(100, MinimumLength = 6)]
+    [StringLength(100, MinimumLength = 8)]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).+$", ErrorMessage = "Password must contain uppercase, lowercase, number and special character.")]
     public string Password { get; set; } = "";
 
     [Required]

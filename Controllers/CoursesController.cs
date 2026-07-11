@@ -54,12 +54,16 @@ public class CoursesController : Controller
 
         return View(new CourseDetailViewModel
         {
+            Id = course.Id,
             CourseCode = course.CourseCode,
             CourseName = course.CourseName,
             Instructor = course.Instructor,
             Fee = course.Fee,
             Capacity = course.Capacity,
             EnrolledStudents = course.EnrolledStudents,
+            StartDate = course.StartDate,
+            Level = course.Level,
+            ThumbnailPath = course.ThumbnailPath,
             Status = course.EnrolledStudents >= course.Capacity
                 ? "Full"
                 : "Available"
@@ -70,15 +74,15 @@ public class CoursesController : Controller
     // CREATE
     // =========================
 
-    [Authorize(Roles="Admin")]
+    [Authorize(Policy="CanManageCourse")]
 public IActionResult Create()
     {
         return View();
     }
 
-  [Authorize(Roles="Admin")]
+  [Authorize(Policy="CanManageCourse")]
 [HttpPost]
-
+    [ValidateAntiForgeryToken]
     public IActionResult Create(CourseCreateViewModel vm)
     {
         if (!ModelState.IsValid)
@@ -101,8 +105,9 @@ public IActionResult Create()
             Fee = vm.Fee,
             Capacity = vm.Capacity,
             EnrolledStudents = 0,
-            StartDate = DateTime.Now,
-            Level = "Beginner"
+            StartDate = vm.StartDate,
+            Level = vm.Level,
+            CourseCategoryId = 1
         };
 
         _service.Add(course);
@@ -110,7 +115,10 @@ public IActionResult Create()
     User.Identity!.Name!,
     "CREATE",
     "Course",
-    $"Created {course.CourseCode}");
+    $"Created {course.CourseCode}",
+    course.Id.ToString(),
+    "Success",
+    HttpContext.TraceIdentifier);
 
         TempData["Success"] = "Course created successfully.";
 
@@ -121,7 +129,7 @@ public IActionResult Create()
     // EDIT
     // =========================
 
-[Authorize(Roles="Admin")]
+[Authorize(Policy="CanManageCourse")]
     [HttpGet]
     public IActionResult Edit(int id)
     {
@@ -142,13 +150,22 @@ public IActionResult Create()
         });
     }
 
-[Authorize(Roles="Admin")]
+[Authorize(Policy="CanManageCourse")]
         [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Edit(CourseEditViewModel vm)
     {
         if (!ModelState.IsValid)
             return View(vm);
+
+        if (_service.CourseCodeExists(vm.CourseCode, vm.Id))
+        {
+            ModelState.AddModelError(
+                nameof(vm.CourseCode),
+                "Course code already exists.");
+
+            return View(vm);
+        }
 
         try
         {
@@ -157,7 +174,10 @@ _audit.Write(
     User.Identity!.Name!,
     "EDIT",
     "Course",
-    $"Edited {vm.CourseCode}");
+    $"Edited {vm.CourseCode}",
+    vm.Id.ToString(),
+    "Success",
+    HttpContext.TraceIdentifier);
             TempData["Success"] = "Course updated.";
 
             return RedirectToAction(nameof(Index));
@@ -175,7 +195,7 @@ _audit.Write(
     // DELETE
     // =========================
 
-[Authorize(Roles="Admin")]
+[Authorize(Policy="CanManageCourse")]
     [HttpGet]
     public IActionResult Delete(int id)
     {
@@ -187,16 +207,28 @@ _audit.Write(
         return View(course);
     }
 
-[Authorize(Roles="Admin")]    [HttpPost]
+[Authorize(Policy="CanManageCourse")]
+    [HttpPost]
+    [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public IActionResult DeleteConfirmed(int id)
     {
+        var course = _service.GetById(id);
+
+        if (course == null)
+            return NotFound();
+
         _service.SoftDelete(id);
-_audit.Write(
-    User.Identity!.Name!,
-    "DELETE",
-    "Course",
-    $"Archive course {id}");
+
+        _audit.Write(
+            User.Identity!.Name!,
+            "DELETE",
+            "Course",
+            $"Archive course {id}",
+            id.ToString(),
+            "Success",
+            HttpContext.TraceIdentifier);
+
         TempData["Success"] = "Course archived.";
 
         return RedirectToAction(nameof(Index));
@@ -206,6 +238,7 @@ _audit.Write(
     // TRASH
     // =========================
 
+    [Authorize(Policy="CanManageCourse")]
     public IActionResult Trash()
     {
         return View(_service.GetDeletedCourses());
@@ -215,17 +248,27 @@ _audit.Write(
     // RESTORE
     // =========================
 
-[Authorize(Roles="Admin")]
+[Authorize(Policy="CanManageCourse")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Restore(int id)
     {
+        var course = _service.GetByIdIncludingDeleted(id);
+
+        if (course == null)
+            return NotFound();
+
         _service.Restore(id);
-_audit.Write(
-    User.Identity!.Name!,
-    "RESTORE",
-    "Course",
-    $"Restore course {id}");
+
+        _audit.Write(
+            User.Identity!.Name!,
+            "RESTORE",
+            "Course",
+            $"Restore course {id}",
+            id.ToString(),
+            "Success",
+            HttpContext.TraceIdentifier);
+
         TempData["Success"] = "Course restored.";
 
         return RedirectToAction(nameof(Trash));
@@ -235,9 +278,9 @@ _audit.Write(
     // ADJUST SEAT
     // =========================
 
-[Authorize(Policy="StaffOnly")]
+[Authorize(Policy="CanAdjustCourseSeats")]
     [HttpGet]
-    public IActionResult AdjustSeat(int id)
+    public IActionResult AdjustSeats(int id)
     {
         var course = _service.GetById(id);
 
@@ -253,10 +296,10 @@ _audit.Write(
         });
     }
 
-[Authorize(Policy="StaffOnly")]
+[Authorize(Policy="CanAdjustCourseSeats")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult AdjustSeat(AdjustSeatViewModel vm)
+    public IActionResult AdjustSeats(AdjustSeatViewModel vm)
     {
         if (!ModelState.IsValid)
             return View(vm);
@@ -264,6 +307,14 @@ _audit.Write(
         try
         {
             _service.AdjustSeats(vm);
+            _audit.Write(
+                User.Identity!.Name!,
+                "ADJUST_SEATS",
+                "Course",
+                $"Adjusted seats by {vm.SeatChange}",
+                vm.Id.ToString(),
+                "Success",
+                HttpContext.TraceIdentifier);
 
             TempData["Success"] = "Capacity updated.";
 
@@ -271,6 +322,15 @@ _audit.Write(
         }
         catch (DbUpdateConcurrencyException)
         {
+            _audit.Write(
+                User.Identity!.Name!,
+                "ADJUST_SEATS",
+                "Course",
+                "Concurrency conflict while adjusting seats",
+                vm.Id.ToString(),
+                "Failed",
+                HttpContext.TraceIdentifier);
+
             ModelState.AddModelError("",
                 "Concurrency conflict detected.");
 
@@ -278,6 +338,15 @@ _audit.Write(
         }
         catch (Exception ex)
         {
+            _audit.Write(
+                User.Identity!.Name!,
+                "ADJUST_SEATS",
+                "Course",
+                ex.Message,
+                vm.Id.ToString(),
+                "Failed",
+                HttpContext.TraceIdentifier);
+
             ModelState.AddModelError("",
                 ex.Message);
 
@@ -286,39 +355,9 @@ _audit.Write(
     }
 
     // =========================
-    // API
-    // =========================
-
-    [HttpGet]
-    [Route("api/courses/{id}")]
-    [AllowAnonymous]
-    public IActionResult GetCourseApi(int id)
-    {
-        var course = _service.GetById(id);
-
-        if (course == null)
-        {
-            return NotFound(new ProblemDetails
-            {
-                Title = "Course Not Found",
-                Detail = $"Course {id} does not exist.",
-                Status = 404,
-                Instance = HttpContext.Request.Path,
-                Extensions =
-                {
-                    ["traceId"] = HttpContext.TraceIdentifier,
-                    ["errorCode"] = "COURSE_NOT_FOUND"
-                }
-            });
-        }
-
-        return Json(course);
-    }
-
-    // =========================
     // STATS
     // =========================
-[Authorize(Policy="StaffOnly")]
+[Authorize(Policy="CanViewCourse")]
 
     public IActionResult Stats()
     {
@@ -331,5 +370,66 @@ _audit.Write(
             AvailableCourses = courses.Count(x => x.EnrolledStudents < x.Capacity),
             TotalRevenue = courses.Sum(x => x.Fee * x.EnrolledStudents)
         });
+    }
+
+    [HttpGet]
+    public IActionResult Search(CourseSearchViewModel vm)
+    {
+        var courses = _service.Search(
+                vm.Keyword,
+                vm.Instructor,
+                vm.MinFee)
+            .Select(c => new CourseListItemViewModel
+            {
+                Id = c.Id,
+                CourseName = c.CourseName,
+                Instructor = c.Instructor,
+                Status = c.EnrolledStudents >= c.Capacity
+                    ? "Full"
+                    : "Available"
+            })
+            .ToList();
+
+        ViewBag.Count = courses.Count;
+        ViewBag.Results = courses;
+
+        return View(vm);
+    }
+
+    [Authorize(Policy = "CanUploadCourseImage")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UploadImage(
+        int id,
+        IFormFile image)
+    {
+        var result =
+            await _service.ReplaceThumbnailAsync(
+                id,
+                image);
+
+        _audit.Write(
+            User.Identity!.Name!,
+            "REPLACE_COURSE_IMAGE",
+            "Course",
+            result.Succeeded
+                ? "Course image replaced"
+                : result.ErrorMessage ?? "Course image rejected",
+            id.ToString(),
+            result.Succeeded ? "Success" : "Failed",
+            HttpContext.TraceIdentifier);
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.ErrorMessage;
+        }
+        else
+        {
+            TempData["Success"] = "Course image uploaded successfully.";
+        }
+
+        return RedirectToAction(
+            nameof(Detail),
+            new { id });
     }
 }

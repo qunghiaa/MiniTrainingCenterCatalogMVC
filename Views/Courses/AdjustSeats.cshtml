@@ -2,8 +2,10 @@
 
 <h2>Adjust Capacity</h2>
 
-<form asp-action="AdjustSeat"
+<form asp-action="AdjustSeats"
       method="post">
+
+    @Html.AntiForgeryToken()
 
     <input asp-for="Id" type="hidden" />
 

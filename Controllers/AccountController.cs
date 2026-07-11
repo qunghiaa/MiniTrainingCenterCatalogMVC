@@ -60,7 +60,7 @@ public class AccountController : Controller
 
             return RedirectToAction(
                 "Index",
-                "Home");
+                "Dashboard");
         }
 
         await _audit.WriteAsync(
@@ -115,12 +115,30 @@ public class AccountController : Controller
                     error.Description);
             }
 
+            await _audit.WriteAsync(
+                vm.Email,
+                "Register",
+                "Account",
+                "Registration failed.",
+                "",
+                "Failed",
+                HttpContext.TraceIdentifier);
+
             return View(vm);
         }
 
         await _userManager.AddToRoleAsync(
             user,
             "User");
+
+        await _audit.WriteAsync(
+            user.Email,
+            "Register",
+            "Account",
+            "New user registered.",
+            "",
+            "Success",
+            HttpContext.TraceIdentifier);
 
         return RedirectToAction(nameof(Login));
     }
@@ -144,8 +162,17 @@ public class AccountController : Controller
     }
 
     [AllowAnonymous]
-    public IActionResult AccessDenied()
+    public async Task<IActionResult> AccessDenied()
     {
+        await _audit.WriteAsync(
+            User.Identity?.Name ?? "Anonymous",
+            "AccessDenied",
+            "Account",
+            "",
+            "Failed",
+            HttpContext.TraceIdentifier,
+            HttpContext.Request.Path);
+
         return View();
     }
 }

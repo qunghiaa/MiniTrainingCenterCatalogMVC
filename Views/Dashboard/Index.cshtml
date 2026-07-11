@@ -71,3 +71,61 @@
     </div>
 
 </div>
+
+<div class="mt-4">
+    <a class="btn btn-outline-primary" asp-controller="Audit" asp-action="Index">View Audit Logs</a>
+</div>
+
+<h3 class="mt-4">Security Today</h3>
+
+<div class="row">
+
+    <div class="col-md-4">
+
+        <div class="card border-danger">
+
+            <div class="card-body">
+
+                <h5>Access Denied</h5>
+
+                <h2>@ViewBag.AccessDeniedToday</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card border-primary">
+
+            <div class="card-body">
+
+                <h5>Sensitive Actions</h5>
+
+                <h2>@ViewBag.SensitiveActionsToday</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card border-warning">
+
+            <div class="card-body">
+
+                <h5>Rejected Uploads</h5>
+
+                <h2>@ViewBag.RejectedUploadsToday</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

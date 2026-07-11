@@ -4,6 +4,8 @@
 
 <form asp-action="Edit" method="post">
 
+    @Html.AntiForgeryToken()
+
     <input asp-for="Id" type="hidden" />
     <input asp-for="RowVersion" type="hidden" />
 

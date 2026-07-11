@@ -6,5 +6,8 @@ public interface IAuditService
         string username,
         string action,
         string entity,
-        string description);
+        string description,
+        string entityId = "",
+        string result = "Success",
+        string traceId = "");
 }

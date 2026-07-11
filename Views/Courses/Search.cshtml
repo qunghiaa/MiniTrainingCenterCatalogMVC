@@ -35,4 +35,44 @@
         Found @ViewBag.Count course(s)
 
     </div>
+
+    var results =
+        ViewBag.Results as IEnumerable<MiniTrainingCenterCatalog.Mvc.ViewModels.CourseListItemViewModel>;
+
+    if (results != null && results.Any())
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Instructor</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in results)
+            {
+                <tr>
+                    <td>@item.CourseName</td>
+                    <td>@item.Instructor</td>
+                    <td>@item.Status</td>
+                    <td>
+                        <a asp-action="Detail"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-info">
+                            Detail
+                        </a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            No matching courses found.
+        </div>
+    }
 }

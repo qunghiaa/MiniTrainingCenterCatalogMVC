@@ -47,6 +47,40 @@ public class CourseRepository : ICourseRepository
             .ToList();
     }
 
+    public List<Course> Search(
+        string? keyword,
+        string? instructor,
+        decimal? minFee)
+    {
+        var query = _context.Courses
+            .Include(x => x.CourseCategory)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            query = query.Where(x =>
+                x.CourseName.Contains(keyword) ||
+                x.CourseCode.Contains(keyword));
+        }
+
+        if (!string.IsNullOrWhiteSpace(instructor))
+        {
+            query = query.Where(x =>
+                x.Instructor.Contains(instructor));
+        }
+
+        if (minFee.HasValue)
+        {
+            query = query.Where(x =>
+                x.Fee >= minFee.Value);
+        }
+
+        return query
+            .OrderBy(x => x.CourseName)
+            .ToList();
+    }
+
     public bool CourseCodeExists(
         string courseCode,
         int? excludeId = null)
@@ -67,6 +101,11 @@ public class CourseRepository : ICourseRepository
     public void Update(Course course)
     {
         _context.Courses.Update(course);
+    }
+
+    public void SetOriginalRowVersion(Course course, byte[] rowVersion)
+    {
+        _context.Entry(course).Property("RowVersion").OriginalValue = rowVersion;
     }
 
     public void SaveChanges()

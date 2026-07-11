@@ -1,17 +1,33 @@
-<h2 class="text-danger">
-    Access Denied
-</h2>
+@{
+    ViewData["Title"] = "Access Denied";
+}
 
-<p>
+<div class="text-center mt-5">
 
-You do not have permission to access this page.
+    <h1 class="text-danger">
 
-</p>
+        Access Denied
 
-<a asp-controller="Home"
-   asp-action="Index"
-   class="btn btn-primary">
+    </h1>
 
-Home
+    <p class="lead">
 
-</a>
+        You do not have permission to access this page.
+
+    </p>
+
+    <p class="text-muted">
+
+        Please sign in with an account that has the required role, or contact an administrator.
+
+    </p>
+
+    <a class="btn btn-primary"
+       asp-controller="Home"
+       asp-action="Index">
+
+        Go Home
+
+    </a>
+
+</div>

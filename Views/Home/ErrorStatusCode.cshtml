@@ -1,0 +1,9 @@
+@{
+    ViewData["Title"] = "Request Error";
+}
+
+<div class="text-center mt-5">
+    <h1 class="text-danger">@ViewBag.StatusCode</h1>
+    <p class="lead">@ViewBag.Message</p>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Go Home</a>
+</div>
